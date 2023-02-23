@@ -1,17 +1,23 @@
 # 로봇 가족
+##### 부제 : AMR과 관제 기술을 이용한 스마트 물류센터 구현 
+
+<br>
 <img src="https://user-images.githubusercontent.com/110883172/218902218-3180dd52-6303-4bcb-adc9-3e61bb6fd40e.png" width="200" height="200">
 
-##### 부제 : AMR과 관제 기술을 이용한 스마트 물류센터 구현 
 ###### 팀원 : 권용민, 김두엽, 류도현, 박민제, 박인, 손훈민, 정재욱, 최선민
+<br>
+<br>
 
 ## 프로젝트 개요
 - 20232년 2월 23일 발표된 정부 정책인 '[스마트 물류 인프라 구축방안](https://www.korea.kr/news/visualNewsView.do?newsId=148912027&pWise=sub&pWiseSub=I1)'
-<img src="https://user-images.githubusercontent.com/110883172/220928275-43f94830-4d69-4403-b48b-676e44df54b4.png" width="600" height="600">
+<img src="https://user-images.githubusercontent.com/110883172/220928275-43f94830-4d69-4403-b48b-676e44df54b4.png" width="400" height="400">
 
  국토부는 차세대 물류 서비스 구현, 세계 최고 수준의 물류 네트워크 구축, 첨단기술 기반 물류 안전망 강화를 위해 투자를 하겠다고 발표를 했습니다. 이러한 흐름 속에서 우리 팀은 다음 두가지 키워드에 집중합니다. __차세대 물류 서비스 구현__ 과 __첨단기술 기반 물류 안정망 강화__ .
  
- __차세대 물류 서비스 구현__ 을 위해서 
- 
+__차세대 물류 서비스 구현__ 을 위해 저희는 __AMR__ 을 한 번 구현해보고자 합니다. 
+- 물류센터에는 수많은 AMR 로봇이 필요하다. 이러한 상황에서 3D Lidar와 같은 고가의 장비없이 2D Lidar와 deepth camera만으로 구현을 할 수 있다면 경쟁력이 있을 것이다.
+- 3D Lidar SLAM보다 deepth camera를 통한 Visual  
+  
  
 
 
