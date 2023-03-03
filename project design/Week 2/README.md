@@ -30,3 +30,6 @@ __터블봇 4 초기 세팅 과정__
 - 맵을 제작하고 SLAM을 완료함 
 <img src="https://user-images.githubusercontent.com/110883172/222610405-d6b86d5b-40cb-4dfd-86ce-5054149a0a2b.png" width="200" height="200">
 <img src="https://user-images.githubusercontent.com/110883172/222610526-0e419d2b-6439-4842-9fd6-ec0cef016cc0.png" width="200" height="200">
+
+- 네비게이션을 위해서 파라미터를 수정해야하며, 다음의 논문을 번역하려고 하고 있습니다.
+- https://kaiyuzheng.me/documents/navguide.pdf
