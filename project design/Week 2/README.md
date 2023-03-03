@@ -7,7 +7,9 @@
 __터블봇 4 초기 세팅 과정__
 - 터틀봇 4는 새제품이 아니라 다른 사람이 쓰던 것을 받아왔기 때문에 문제가 생겼다. 여러가지 문제로 인해 1~2일 정도 시간을 버리겠되었다.
 - 터틀봇 4를 분해하여 SD카드를 분리하였고, SD카드에 새롭게 터틀봇4 이미지를 구웠다.
-![image](https://user-images.githubusercontent.com/110883172/222608491-e54989c5-960f-4ae0-9fe3-086b3abe0f22.png)
+
+<img src="https://user-images.githubusercontent.com/110883172/222608491-e54989c5-960f-4ae0-9fe3-086b3abe0f22.png" width="200" height="200">
+
 - 문제는 SLAM에서 Rviz가 map topic을 받아오지 못한다. 문제는 RPLidar 패키지를 다운받지 않아서 생긴 문제로 보이며, 해결이 가능할 것으로 예상된다.
 
 
