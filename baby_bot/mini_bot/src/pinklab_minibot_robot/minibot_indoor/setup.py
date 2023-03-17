@@ -20,7 +20,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'obstacle_detection = minibot_indoor.obstacle_detection:main'
+            'obstacle_detection = minibot_indoor.obstacle_detection:main',
+            'path_planning = minibot_indoor.path_planning:main',
+            'order = minibot_indoor.order:main',
+            'image_processing = minibot_indoor.image_processing:main',
+            'Astar = minibot_indoor.Astar:main',
+            
         ],
     },
 )
