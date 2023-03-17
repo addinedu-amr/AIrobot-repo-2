@@ -14,32 +14,17 @@ rp.init()
 nav = BasicNavigator()
 
 # 장애물을 탐지하는 부분..
-class Obstacle_Subscriber(Node):
-    def __init__(self):
-        super().__init__('turtlesim_subscriber') # Node 클래스에 다음 문자열 이름의 생성자를 거쳐온다.
-        self.subscription = self.create_subscription(
-            IsObstacle,
-            '/obstacle_detect',
-            self.callback,
-            10
-        ) # 이전 장에서 했던 이야기, create_subscription으로 만들었다.
-        self.subscription
-
-    def callback(self, msg):
-        print("move : ", msg.check_obstacle, ", distance : ", msg.min_distance)
-        # 데이터가 도착했을 때 출력하는 callback함수
-
-
-# 명령을 내리는 부분..
-class order_Subscriber(Node):
+class Subscriber(Node):
     def __init__(self):
         super().__init__('test_sub')
-        self.subscription = self.create_subscription(StartEnd, 'test_topic', self.listener_callback, 10)
-        self.subscription  # prevent unused variable warning
+        self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10)
+        self.subscription2 = self.create_subscription(StartEnd, 'test_topic', self.test_callback, 10)
 
-    def listener_callback(self, msg):
+    def obstacle_callback(self, msg):
+        print("move : ", msg.check_obstacle, ", distance : ", msg.min_distance)
+
+    def test_callback(self, msg):
         go_my_robot(get_my_map_coordinate(), (1,0), (msg.end_y, msg.end_x))
-
 
 def go_my_robot(my_map_coordinate, start, end):
     image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
@@ -63,8 +48,6 @@ def go_my_robot(my_map_coordinate, start, end):
 
     for route in path:
         print("명령을 이수합니다." + str(route) + "좌표로 이동합니다." )
-        
-        
         
         #북쪽
         if route[1] - path_0[1] == 1:
@@ -93,8 +76,7 @@ def go_my_robot(my_map_coordinate, start, end):
             my_map_coordinate[route[0]][route[1]].pose.orientation.y = 0.0
             my_map_coordinate[route[0]][route[1]].pose.orientation.z = -0.7
             my_map_coordinate[route[0]][route[1]].pose.orientation.w = 0.7
-            
-            
+         
         nav.goToPose(my_map_coordinate[route[0]][route[1]])
 
         i=0
@@ -110,7 +92,6 @@ def go_my_robot(my_map_coordinate, start, end):
                     nav.cancelTask()
                     print("명령을 이수했습니다.")
 
-
         print(str(route) + "좌표로 이동했습니다." )
         print()
         
@@ -119,14 +100,11 @@ def go_my_robot(my_map_coordinate, start, end):
 def get_my_map_coordinate():
     image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
     image.run()
-
-
     my_map_coordinate = []
     my_map_layer = []
-
     cor_x = image.origin_x  #1.1씩 더하세요
     cor_y = image.origin_y  #1.1씩 빼세요.
-        
+
     for i in range(len(image.matrix)):
         cor_x = image.origin_x
         cor_y = cor_y - image.sero_m
@@ -146,7 +124,6 @@ def get_my_map_coordinate():
                 goal.pose.orientation.z = 0.0
                 goal.pose.orientation.w = 1.0
                 my_map_layer.append(goal)
-
         my_map_coordinate.append(my_map_layer)
         my_map_layer = []
     return my_map_coordinate
@@ -157,18 +134,11 @@ def main(args=None):
     # args = None 아무런 의미가 없는말이다.
     # init 에 뭔가를 넣을 수 있으니 만약에 하고 싶다면 이걸 수정해라 라고 해서 args = None이라고 한거다.
 
-    turtlesim_subscriber = Obstacle_Subscriber()
-    test_sub = order_Subscriber()
+    test_sub = Subscriber()
     rp.spin(test_sub)
-    rp.spin(turtlesim_subscriber)
-    # 객체를 생성해서 명령을 하라고 하고 꺼지면
-
-    turtlesim_subscriber.destroy_node()
     test_sub.destroy_node()
     rp.shutdown()
     # 종료해달라
-
-
 if __name__ == '__main__':
     main()
 
