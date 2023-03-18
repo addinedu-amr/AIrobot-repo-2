@@ -20,82 +20,105 @@ class Subscriber(Node):
         self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10)
         self.subscription2 = self.create_subscription(StartEnd, 'test_topic', self.test_callback, 10)
 
+        self.order_start = False
+        self.path_count = 1
+        self.path = None
+        self.now_location = (1, 0)
+
+        self.pre_order_x = None
+        self.pre_order_y = None
+        
+        self.result = None
+        self.check_obstacle = None
+
     def obstacle_callback(self, msg):
+        self.check_obstacle = msg.check_obstacle
         print("move : ", msg.check_obstacle, ", distance : ", msg.min_distance)
 
     def test_callback(self, msg):
-        go_my_robot(get_my_map_coordinate(), (1,0), (msg.end_y, msg.end_x))
+        print("함수를 새로시작합니다.")
+        if self.order_start == False:
+            if self.pre_order_y == msg.end_y and self.pre_order_x == msg.end_x:
+                pass
+            else:
+                self.result, self.path = my_robot_path("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml", self.now_location, (msg.end_y, msg.end_x) )
+                self.pre_order_y = msg.end_y
+                self.pre_order_x = msg.end_x
+                self.order_start = True
 
-def go_my_robot(my_map_coordinate, start, end):
-    image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
+
+        if self.path != None:
+            if len(self.path) > self.path_count:
+                self.now_location = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
+                self.path_count = self.path_count + 1
+            else:
+                self.order_start = False
+                self.path = None
+                self.path_count = 1
+        else:
+            if self.order_start == True:
+                print("이동할 수 없는 지점으로 명령하고 있습니다.")
+                self.order_start = False
+
+
+
+def my_robot_path(pgm_path, yaml_path, start, end):
+    image = image_processing.pgm_to_matrix(pgm_path, yaml_path ,3 , 12, -1.1, 2.2)
     image.run()
     my_map = image.matrix
     make_route = Astar.Astar()
     result, path = make_route.run(my_map , start, end)
+    return result, path
 
-    print(result)
+def go_my_robot(my_map_coordinate, start, end):
+    print("명령을 이수합니다." + str(start) + "좌표로 이동합니다." )
+    #북쪽
+    if end[1] - start[1] == 1:
+        my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.z = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 1.0
+    
+    #남쪽
+    elif end[1] - start[1] == -1:
+        my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.z = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = -1.0
+    
+    # 서쪽
+    elif end[0] - start[0] == -1:
+        my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.z = 0.7
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 0.7
+        
+    # 동쪽
+    elif end[0] - start[0] == 1:
+        my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.z = -0.7
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 0.7
+        
+    nav.goToPose(my_map_coordinate[end[0]][end[1]])
 
-    print("경로 생성 맵입니다. 숫자 2는 경로입니다.")
-    for i in result:
-        print(i)
-        
-    if path == None:
-        print("이동할 수 없는 지점으로 이동을 명령하고 있습니다.")
-        return
-    else:
-        path_0 = path[0]
-        path = path[1:]
-
-    for route in path:
-        print("명령을 이수합니다." + str(route) + "좌표로 이동합니다." )
-        
-        #북쪽
-        if route[1] - path_0[1] == 1:
-            my_map_coordinate[route[0]][route[1]].pose.orientation.x = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.y = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.z = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.w = 1.0
-        
-        #남쪽
-        elif route[1] - path_0[1] == -1:
-            my_map_coordinate[route[0]][route[1]].pose.orientation.x = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.y = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.z = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.w = -1.0
-        
-        # 서쪽
-        elif route[0] - path_0[0] == -1:
-            my_map_coordinate[route[0]][route[1]].pose.orientation.x = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.y = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.z = 0.7
-            my_map_coordinate[route[0]][route[1]].pose.orientation.w = 0.7
-            
-        # 동쪽
-        elif route[0] - path_0[0] == 1:
-            my_map_coordinate[route[0]][route[1]].pose.orientation.x = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.y = 0.0
-            my_map_coordinate[route[0]][route[1]].pose.orientation.z = -0.7
-            my_map_coordinate[route[0]][route[1]].pose.orientation.w = 0.7
-         
-        nav.goToPose(my_map_coordinate[route[0]][route[1]])
-
-        i=0
-        while not nav.isTaskComplete():
-            i = i+1
-            feedback = nav.getFeedback()
-            if feedback and i % 5 == 0:
+    i=0
+    while not nav.isTaskComplete():
+        i = i+1
+        feedback = nav.getFeedback()
+        if feedback and i % 5 == 0:
+            print("Distance remaining : " + str(feedback.distance_remaining) + " m")
+            if feedback.distance_remaining > 0.1:
+                pass
+            else:
                 print("Distance remaining : " + str(feedback.distance_remaining) + " m")
-                if feedback.distance_remaining > 0.1:
-                    pass
-                else:
-                    print("Distance remaining : " + str(feedback.distance_remaining) + " m")
-                    nav.cancelTask()
-                    print("명령을 이수했습니다.")
+                nav.cancelTask()
+                print("명령을 이수했습니다.")
 
-        print(str(route) + "좌표로 이동했습니다." )
-        print()
-        
-        path_0 = route
+    print(str(end) + "좌표로 이동했습니다." )
+    print()
+    
+    return end
 
 def get_my_map_coordinate():
     image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
@@ -133,7 +156,6 @@ def main(args=None):
     
     # args = None 아무런 의미가 없는말이다.
     # init 에 뭔가를 넣을 수 있으니 만약에 하고 싶다면 이걸 수정해라 라고 해서 args = None이라고 한거다.
-
     test_sub = Subscriber()
     rp.spin(test_sub)
     test_sub.destroy_node()
@@ -141,6 +163,7 @@ def main(args=None):
     # 종료해달라
 if __name__ == '__main__':
     main()
+    
 
     
 
