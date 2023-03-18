@@ -119,8 +119,8 @@ def go_my_robot(my_map_coordinate, start, end):
     i=0
     while not nav.isTaskComplete():
         if check_obstacle == True:
-            print("전방에 장애물이 있습니다.")
-        
+            obstacle_reaction()
+
         else:
             i = i+1
             feedback = nav.getFeedback()
@@ -168,6 +168,12 @@ def get_my_map_coordinate():
         my_map_coordinate.append(my_map_layer)
         my_map_layer = []
     return my_map_coordinate
+
+
+
+def obstacle_reaction():
+    print("전방에 장애물이 있습니다.")
+
 
 
 def main(args=None):
