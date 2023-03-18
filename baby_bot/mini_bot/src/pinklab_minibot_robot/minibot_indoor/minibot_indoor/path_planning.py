@@ -31,13 +31,13 @@ class Subscriber(Node):
         self.pre_order_y = None
         
         self.result = None
-        self.check_obstacle = None
+        self.check_obstacle = False
 
     def obstacle_callback(self, msg):
         threading.Thread(target=self.process_message_b, args=(msg,)).start()
 
     def process_message_b(self, msg):
-        self.check_obstacle = msg.check_obstacle
+        check_obstacle_front(msg.check_obstacle)
         print("move : ", msg.check_obstacle, ", distance : ", msg.min_distance)
 
     def test_callback(self, msg):
@@ -51,7 +51,6 @@ class Subscriber(Node):
                 self.pre_order_x = msg.end_x
                 self.order_start = True
 
-        # 그래 여기까지는 괜찮아 이 밑에가 lifecycle이 길어 
         if self.path != None:
             if len(self.path) > self.path_count:
                 self.now_location = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
@@ -69,6 +68,12 @@ class Subscriber(Node):
         rp.spin(self)
 
 
+# 실시간 구독한 장애물 정보를 전역변수로 선언하면 될듯..
+check_obstacle = False
+def check_obstacle_front(check):
+    global check_obstacle
+    check_obstacle = check
+
 
 def my_robot_path(pgm_path, yaml_path, start, end):
     image = image_processing.pgm_to_matrix(pgm_path, yaml_path ,3 , 12, -1.1, 2.2)
@@ -79,6 +84,7 @@ def my_robot_path(pgm_path, yaml_path, start, end):
     return result, path
 
 def go_my_robot(my_map_coordinate, start, end):
+    global check_obstacle
     print("명령을 이수합니다." + str(start) + "좌표로 이동합니다." )
     #북쪽
     if end[1] - start[1] == 1:
@@ -112,16 +118,20 @@ def go_my_robot(my_map_coordinate, start, end):
 
     i=0
     while not nav.isTaskComplete():
-        i = i+1
-        feedback = nav.getFeedback()
-        if feedback and i % 5 == 0:
-            print("Distance remaining : " + str(feedback.distance_remaining) + " m")
-            if feedback.distance_remaining > 0.1:
-                pass
-            else:
+        if check_obstacle == True:
+            print("전방에 장애물이 있습니다.")
+        
+        else:
+            i = i+1
+            feedback = nav.getFeedback()
+            if feedback and i % 5 == 0:
                 print("Distance remaining : " + str(feedback.distance_remaining) + " m")
-                nav.cancelTask()
-                print("명령을 이수했습니다.")
+                if feedback.distance_remaining > 0.1:
+                    pass
+                else:
+                    print("Distance remaining : " + str(feedback.distance_remaining) + " m")
+                    nav.cancelTask()
+                    print("명령을 이수했습니다.")
 
     print(str(end) + "좌표로 이동했습니다." )
     print()
