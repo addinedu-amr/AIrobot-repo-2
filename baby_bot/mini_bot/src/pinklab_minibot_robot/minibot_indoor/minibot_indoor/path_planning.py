@@ -5,6 +5,7 @@ from rclpy.duration import Duration
 from minibot_indoor import image_processing
 from minibot_indoor import Astar
 import rclpy as rp
+import threading
 from rclpy.node import Node
 from std_msgs.msg import String
 from minibot_msgs.msg import IsObstacle
@@ -17,8 +18,9 @@ nav = BasicNavigator()
 class Subscriber(Node):
     def __init__(self):
         super().__init__('test_sub')
-        self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10)
-        self.subscription2 = self.create_subscription(StartEnd, 'test_topic', self.test_callback, 10)
+        self.callback_group = rp.callback_groups.ReentrantCallbackGroup()
+        self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10, callback_group=self.callback_group)
+        self.subscription2 = self.create_subscription(StartEnd, 'Robot_order', self.test_callback, 10)
 
         self.order_start = False
         self.path_count = 1
@@ -32,6 +34,9 @@ class Subscriber(Node):
         self.check_obstacle = None
 
     def obstacle_callback(self, msg):
+        threading.Thread(target=self.process_message_b, args=(msg,)).start()
+
+    def process_message_b(self, msg):
         self.check_obstacle = msg.check_obstacle
         print("move : ", msg.check_obstacle, ", distance : ", msg.min_distance)
 
@@ -46,7 +51,7 @@ class Subscriber(Node):
                 self.pre_order_x = msg.end_x
                 self.order_start = True
 
-
+        # 그래 여기까지는 괜찮아 이 밑에가 lifecycle이 길어 
         if self.path != None:
             if len(self.path) > self.path_count:
                 self.now_location = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
@@ -59,6 +64,9 @@ class Subscriber(Node):
             if self.order_start == True:
                 print("이동할 수 없는 지점으로 명령하고 있습니다.")
                 self.order_start = False
+
+    def spin(self):
+        rp.spin(self)
 
 
 
@@ -153,13 +161,16 @@ def get_my_map_coordinate():
 
 
 def main(args=None):
-    
+    node = Subscriber()
+    node.spin()
+    node.destroy_node()
+    rp.shutdown()
+
     # args = None 아무런 의미가 없는말이다.
     # init 에 뭔가를 넣을 수 있으니 만약에 하고 싶다면 이걸 수정해라 라고 해서 args = None이라고 한거다.
-    test_sub = Subscriber()
-    rp.spin(test_sub)
-    test_sub.destroy_node()
-    rp.shutdown()
+    #test_sub = Subscriber()
+    #rp.spin(test_sub)
+    #test_sub.destroy_node()
     # 종료해달라
 if __name__ == '__main__':
     main()
