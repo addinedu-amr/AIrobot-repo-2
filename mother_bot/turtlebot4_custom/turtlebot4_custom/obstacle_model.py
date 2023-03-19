@@ -5,9 +5,10 @@ from ament_index_python.packages import get_package_share_directory
 
 class Inference:
     def __init__(self):
-        self.pt_path = get_package_share_directory('turtlebot4_custom') + '/pt_files/obstacle.pt'
+        self.pt_path = get_package_share_directory('turtlebot4_custom') + '/pt_files/box.pt'
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=self.pt_path, force_reload=True)
-        self.model.conf = 0.8
+        # self.model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5s.pt', force_reload=True)
+        self.model.conf = 0.6
 
     def inference(self, source):
         raw_results = self.model(source)
@@ -15,7 +16,7 @@ class Inference:
         refined_results = np.array(raw_results_xyxy.to('cpu'))
         return refined_results
 
-    def get_center_point(x1, y1, x2, y2):
+    def get_center_point(self, x1, y1, x2, y2):
         center_x = (x1 + x2) // 2
         center_y = (y1 + y2) // 2
         return center_x, center_y
@@ -26,3 +27,4 @@ class Inference:
 # if __name__== '__main__':
 #     main()
 
+# 640 480
