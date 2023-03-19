@@ -6,7 +6,7 @@ from minibot_msgs.msg import StartEnd
 class Publisher(Node):
     def __init__(self):
         super().__init__('test_pub')
-        self.publisher_ = self.create_publisher(StartEnd, 'test_topic', 10)
+        self.publisher_ = self.create_publisher(StartEnd, 'Robot_order', 10)
         timer_period = 1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0

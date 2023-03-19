@@ -18,7 +18,7 @@ class ObstacleDetect(Node):
         min_data = min(msg.ranges[170:210])  # ladar의 앞 부분 인식
         self.is_osbstacle.min_distance = min_data
         
-        if min_data < 0.2:                    # 0.2m 이하이면 주행 멈추라고 신호 줌
+        if min_data < 0.3:                    # 0.2m 이하이면 주행 멈추라고 신호 줌
             self.is_osbstacle.check_obstacle = True
         else:
             self.is_osbstacle.check_obstacle = False

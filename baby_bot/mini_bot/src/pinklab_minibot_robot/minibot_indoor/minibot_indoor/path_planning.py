@@ -12,6 +12,7 @@ from minibot_msgs.msg import IsObstacle
 from minibot_msgs.msg import StartEnd
 
 import time
+from geometry_msgs.msg import Twist
 
 rp.init()
 nav = BasicNavigator()
@@ -23,6 +24,9 @@ class Subscriber(Node):
         self.callback_group = rp.callback_groups.ReentrantCallbackGroup()
         self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10, callback_group=self.callback_group)
         self.subscription2 = self.create_subscription(StartEnd, 'Robot_order', self.test_callback, 10)
+        self.publisher = self.create_publisher(Twist, 'base_controller/cmd_vel_unstamped', 10)
+
+
 
         self.order_start = False
         self.path_count = 1
@@ -44,7 +48,9 @@ class Subscriber(Node):
 
     def test_callback(self, msg):
         print("함수를 새로시작합니다.")
-        if self.order_start == False:
+        self.back_robot()
+
+        """if self.order_start == False:
             if self.pre_order_y == msg.end_y and self.pre_order_x == msg.end_x:
                 pass
             else:
@@ -58,6 +64,10 @@ class Subscriber(Node):
                 self.now_location, success = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
                 if success == True:
                     self.path_count = self.path_count + 1
+                else:
+                    print("0.2m 후진합니다.")
+                    self.back_robot()
+                    time.sleep(10)
             else:
                 self.order_start = False
                 self.path = None
@@ -66,9 +76,18 @@ class Subscriber(Node):
             if self.order_start == True:
                 print("이동할 수 없는 지점으로 명령하고 있습니다.")
                 self.order_start = False
+"""
 
     def spin(self):
         rp.spin(self)
+
+    # 후진하는 부분
+    def back_robot(self):
+        print("후진을 실시합니다.")
+        twist = Twist()
+        twist.linear.x = -0.2  # 속도 값을 -0.2로 수정
+        twist.angular.z = 0.0
+        self.publisher.publish(twist)
 
 
 # 실시간 구독한 장애물 정보를 전역변수로 선언하면 될듯..
@@ -133,8 +152,6 @@ def go_my_robot(my_map_coordinate, start, end):
             else:
                 print("5초간 정지해보니 고정된 물체로 판단되어 경로를 재탐색합니다.")
                 nav.cancelTask()
-                return start, False
-
             
         else:
             watiting_second = False
@@ -152,7 +169,10 @@ def go_my_robot(my_map_coordinate, start, end):
     print(str(end) + "좌표로 이동했습니다." )
     print()
     
-    return end, True
+    if check_obstacle == True:
+        return start, False
+    else:
+        return end, True
 
 def get_my_map_coordinate():
     image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
