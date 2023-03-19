@@ -13,7 +13,7 @@ __터블봇 4 초기 세팅 과정__
 - 문제는 SLAM에서 Rviz가 map topic을 받아오지 못한다. 문제는 RPLidar 패키지를 다운받지 않아서 생긴 문제로 보이며, 해결이 가능할 것으로 예상된다.
 
 
-###### Visual SLAM을 차선 그리기
+###### 차선 그리기
 <img src="https://user-images.githubusercontent.com/110883172/222609300-fca8bed4-7943-40d4-b00c-97427d25b640.jpg" width="200" height="200">
 
 - 마스킹 테이프를 이용하여 차선을 설정함. 장애물이 생기면 다른 차선으로 이동하게 만들 예정
