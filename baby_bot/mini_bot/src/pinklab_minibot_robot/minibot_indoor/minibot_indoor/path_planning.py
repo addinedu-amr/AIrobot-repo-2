@@ -48,9 +48,7 @@ class Subscriber(Node):
 
     def test_callback(self, msg):
         print("함수를 새로시작합니다.")
-        self.back_robot()
-
-        """if self.order_start == False:
+        if self.order_start == False:
             if self.pre_order_y == msg.end_y and self.pre_order_x == msg.end_x:
                 pass
             else:
@@ -67,7 +65,7 @@ class Subscriber(Node):
                 else:
                     print("0.2m 후진합니다.")
                     self.back_robot()
-                    time.sleep(10)
+                    time.sleep(5)
             else:
                 self.order_start = False
                 self.path = None
@@ -76,7 +74,6 @@ class Subscriber(Node):
             if self.order_start == True:
                 print("이동할 수 없는 지점으로 명령하고 있습니다.")
                 self.order_start = False
-"""
 
     def spin(self):
         rp.spin(self)
