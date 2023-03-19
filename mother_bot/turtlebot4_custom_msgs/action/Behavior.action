@@ -2,7 +2,7 @@
 string boot
 ---
 # result
-string now
+string lane
 ---
 # feedback
 int8 lane_num
