@@ -11,6 +11,8 @@ from std_msgs.msg import String
 from minibot_msgs.msg import IsObstacle
 from minibot_msgs.msg import StartEnd
 
+import time
+
 rp.init()
 nav = BasicNavigator()
 
@@ -53,8 +55,9 @@ class Subscriber(Node):
 
         if self.path != None:
             if len(self.path) > self.path_count:
-                self.now_location = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
-                self.path_count = self.path_count + 1
+                self.now_location, success = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
+                if success == True:
+                    self.path_count = self.path_count + 1
             else:
                 self.order_start = False
                 self.path = None
@@ -75,6 +78,7 @@ def check_obstacle_front(check):
     check_obstacle = check
 
 
+
 def my_robot_path(pgm_path, yaml_path, start, end):
     image = image_processing.pgm_to_matrix(pgm_path, yaml_path ,3 , 12, -1.1, 2.2)
     image.run()
@@ -85,6 +89,9 @@ def my_robot_path(pgm_path, yaml_path, start, end):
 
 def go_my_robot(my_map_coordinate, start, end):
     global check_obstacle
+    watiting_second = False
+
+
     print("명령을 이수합니다." + str(start) + "좌표로 이동합니다." )
     #북쪽
     if end[1] - start[1] == 1:
@@ -119,9 +126,18 @@ def go_my_robot(my_map_coordinate, start, end):
     i=0
     while not nav.isTaskComplete():
         if check_obstacle == True:
-            obstacle_reaction()
+            if watiting_second == False:
+                print("전방에 장애물이 있습니다. 5초간 정지합니다.")
+                time.sleep(5)
+                watiting_second = True
+            else:
+                print("5초간 정지해보니 고정된 물체로 판단되어 경로를 재탐색합니다.")
+                nav.cancelTask()
+                return start, False
 
+            
         else:
+            watiting_second = False
             i = i+1
             feedback = nav.getFeedback()
             if feedback and i % 5 == 0:
@@ -136,7 +152,7 @@ def go_my_robot(my_map_coordinate, start, end):
     print(str(end) + "좌표로 이동했습니다." )
     print()
     
-    return end
+    return end, True
 
 def get_my_map_coordinate():
     image = image_processing.pgm_to_matrix("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml" ,3 , 12, -1.1, 2.2)
@@ -168,12 +184,6 @@ def get_my_map_coordinate():
         my_map_coordinate.append(my_map_layer)
         my_map_layer = []
     return my_map_coordinate
-
-
-
-def obstacle_reaction():
-    print("전방에 장애물이 있습니다.")
-
 
 
 def main(args=None):
