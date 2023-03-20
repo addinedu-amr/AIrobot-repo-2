@@ -38,7 +38,7 @@ class LaneSubscriber(Node):
             LaneDetection,
             '/lane_det_result',
             self.callback_lane,
-            100
+            10
         )
 
     def callback_lane(self, msg):
@@ -70,6 +70,8 @@ class BehaviorServer(Node):
         self.sb_obj = sub1
         self.sb_lane = sub2
         self.sb_marker = sub3
+        self.lane_num = 0
+        self.is_lane_num_det = False
         self.action_server = ActionServer(
             self,
             Behavior,
@@ -85,130 +87,75 @@ class BehaviorServer(Node):
             self.get_logger().info("'start'를 입력해야합니다.")
             return 0
         
+        if not self.is_lane_num_det:
+            self.lane_num = self.sb_lane.lane_num
+            self.is_lane_num_det = True
+
         feedback_msg = Behavior.Feedback()
         pub_msg = Twist()
         while True:
             # 장애물 회피
-            # if (self.sb_obj.pixel_x > 270 and self.sb_obj.pixel_x < 370) and (self.sb_obj.distance > 30 and self.sb_obj.distance < 60):
-            #     #2차선
-            #     #print(self.lane_num)
-            #     if self.sb_lane.lane_num == 2:
-            #         start_time = time.time()
-            #         while time.time() - start_time < 5.236:
-            #             pub_msg.angular.z = 0.3
-            #             pub_msg.linear.x = 0.0
-            #             self.publisher_obs.publish(pub_msg)
-            #             print('111111111111111111111')
-            #         start_time = time.time()
-            #         while time.time() - start_time < 6:
-            #             pub_msg.angular.z = 0.0
-            #             pub_msg.linear.x = 0.1
-            #             self.publisher_obs.publish(pub_msg)
-            #             print('222222222222222222222')
-            #         start_time = time.time()
-            #         while time.time() - start_time < 5.236:
-            #             pub_msg.angular.z = -0.3
-            #             pub_msg.linear.x = 0.0
-            #             self.publisher_obs.publish(pub_msg)
-            #             print('333333333333333333333333')
-            #         # start_time = time.time()
-            #         # while time.time() - start_time < 8:
-            #         #     pub_msg.angular.z = 0.0
-            #         #     pub_msg.linear.x = 0.1
-            #         #     self.publisher_obs.publish(pub_msg)
-            #         #     print('4444444444444444444444')
-            #         # start_time = time.time()
-            #         # while time.time() - start_time < 2:
-            #         #     pub_msg.angular.z = -0.2
-            #         #     pub_msg.linear.x = 0.0
-            #         #     self.publisher_obs.publish(pub_msg)
-            #         #     print('55555555555555555555')
-            #         self.sb_obj.distance = 0
-            #         self.sb_obj.pixel_x = 0
-            #         self.sb_obj.pixel_y = 0
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #         print('OUTOUTOUTOUTOUTOUTOUT')
-            #     elif self.sb_lane.lane_num == 1:
-            #         #1차선
-            #         start_time = time.time()
-            #         while time.time() - start_time < 5.236:
-            #             pub_msg.angular.z = 0.3
-            #             pub_msg.linear.x = 0.0
-            #             self.publisher_obs.publish(pub_msg)
-            #         start_time = time.time()
-            #         while time.time() - start_time < 6:
-            #             pub_msg.angular.z = 0.0
-            #             pub_msg.linear.x = 0.1
-            #             self.publisher_obs.publish(pub_msg)
-            #         start_time = time.time()
-            #         while time.time() - start_time < 5.236:
-            #             pub_msg.angular.z = -0.3
-            #             pub_msg.linear.x = 0.0
-            #             self.publisher_obs.publish(pub_msg)
-            #         start_time = time.time()
-            #         while time.time() - start_time < 8:
-            #             pub_msg.angular.z = 0.0
-            #             pub_msg.linear.x = 0.1
-            #             self.publisher_obs.publish(pub_msg)
-            #         start_time = time.time()
-            #         while time.time() - start_time < 2:
-            #             pub_msg.angular.z = -0.2
-            #             pub_msg.linear.x = 0.0
-            #             self.publisher_obs.publish(pub_msg)
-            #     else:
-            #         print('----------------------------------')
-            #         print('----------------------------------')
-            #         print('----------------------------------')
-            #         print('----------------------------------')
-            #         print('----------------------------------')
+            if (self.sb_obj.pixel_x > 270 and self.sb_obj.pixel_x < 370) and (self.sb_obj.distance > 0 and self.sb_obj.distance < 180):
+                feedback_msg.status = "장애물 회피중"
+                #2차선
+                #print(self.lane_num)
+                if self.lane_num == 2:
+                    start_time = time.time()
+                    while time.time() - start_time < 1.5:
+                        pub_msg.angular.z = 0.2
+                        pub_msg.linear.x = 0.0
+                        self.publisher_obs.publish(pub_msg)
+                    self.lane_num = 1
+                elif self.lane_num == 1:
+                    #1차선
+                    start_time = time.time()
+                    while time.time() - start_time < 1.5:
+                        pub_msg.angular.z = -0.2
+                        pub_msg.linear.x = 0.0
+                        self.publisher_obs.publish(pub_msg)
+                else:
+                    pass
             
             # Aruco Marker
             if self.sb_marker.marker_dist > 0:
-                if self.sb_marker.marker_dist > 40:
+                feedback_msg.status = "스테이션 도킹중"
+                if self.sb_marker.marker_dist > 37:
                     pub_msg.linear.x = 0.03
                     pub_msg.angular.z = self.compensate_x(320, self.sb_marker.marker_x*10)
                     print(pub_msg.angular.z)
                     self.publisher_lane.publish(pub_msg)
-                elif self.sb_marker.marker_dist < 40 and self.sb_marker.marker_dist > 20:
+                elif self.sb_marker.marker_dist <= 37 and self.sb_marker.marker_dist > 34:
                     pub_msg.linear.x = 0.0
-                    pub_msg.angular.z = self.compensate_x(320, self.sb_marker.marker_x*10)
+                    pub_msg.angular.z = -self.compensate_x(320, self.sb_marker.marker_x*10)
                     self.publisher_lane.publish(pub_msg)
-                    if 320 - self.sb_marker.marker_x*10 < 5:
+                    print(self.sb_marker.marker_x)
+                    # if (320 + self.sb_marker.marker_x*10 < 390) and (320 + self.sb_marker.marker_x*10 > 345):
+                    if (self.sb_marker.marker_x < 3) and (self.sb_marker.marker_x > 2):
                         print('---------------------------------------')
                         print('------------------END------------------')
                         print('---------------------------------------')
-                        print(320 - self.sb_marker.marker_x*10)
+                        pub_msg.linear.x = 0.0
+                        pub_msg.angular.z = 0.0
+                        self.publisher_lane.publish(pub_msg)
+                        print(self.sb_marker.marker_x)
                         break
                 else:
-                    break
+                    pass
 
             else:
                 # 일반주행
-                pub_msg.linear.x = float(self.sb_lane.linear_x)
                 pub_msg.angular.z = float(self.sb_lane.angular_z)
+                pub_msg.linear.x = float(self.sb_lane.linear_x)
                 self.publisher_lane.publish(pub_msg)
+                feedback_msg.status = "현재 주행중"
 
-            #print(self.sb_marker.marker_dist)
-            # 도착 신호
-            # if False:
-            #     break
-
+            goal_handle.publish_feedback(feedback_msg)
             time.sleep(0.01)
         
         goal_handle.succeed()
         result = Behavior.Result()
-
-        result.lane = str(self.sb_lane.lane_num)
+        #result.lane = str(self.lane_num)
+        result.dock = "**********Docking Done************"
         return result
     
     def compensate_x(self, center_x, target_x):    
