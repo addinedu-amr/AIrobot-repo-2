@@ -146,7 +146,7 @@ def go_my_robot(my_map_coordinate, start, end):
         my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
         my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
         my_map_coordinate[end[0]][end[1]].pose.orientation.z = -1.0
-        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 0.0
     
     # 서쪽
     elif end[0] - start[0] == -1:

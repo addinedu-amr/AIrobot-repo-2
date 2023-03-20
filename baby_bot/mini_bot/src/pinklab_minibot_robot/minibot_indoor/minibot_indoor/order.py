@@ -22,6 +22,7 @@ class Publisher(Node):
 
     def timer_callback(self):
         if len(self.end_point_x) > self.end_point_count:
+            print(str(self.end_point_x[self.end_point_count]) + "," + str(self.end_point_y[self.end_point_count]) + "로 이동을 시작합니다." )
             msg = StartEnd()
             msg.end_x = self.end_point_x[self.end_point_count]
             msg.end_y = self.end_point_y[self.end_point_count]
@@ -42,7 +43,6 @@ class Publisher(Node):
             if len(self.end_point_x) > self.end_point_count:
                 print("명령을 완료했습니다. 다음 명령을 진행합니다.")
                 self.end_point_count = self.end_point_count + 1
-                print(str(self.end_point_x) + "," + str(self.end_point_y) + "로 이동을 시작합니다." )
             else:
                 print("모든 명령을 완료했습니다. 집으로 복귀 시킵니다.")
 
