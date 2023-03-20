@@ -6,7 +6,6 @@ import cv_bridge
 import cv2
 from sensor_msgs.msg import Image
 from turtlebot4_custom_msgs.msg import LaneDetection
-#from geometry_msgs.msg import Twist
 from ultralytics import YOLO
 from .yolo_segmentation import YOLOSegmentation
 from ament_index_python.packages import get_package_share_directory
@@ -16,6 +15,7 @@ import time
 class LaneDetector(Node):
     def __init__(self):
         super().__init__('lane_detector')
+        self.right_flag = True
         self.turn_direction = ""
         self.center_pt_x_blue = 0
         self.center_pt_x_orange = 0
@@ -86,11 +86,11 @@ class LaneDetector(Node):
             # 주행시작시 현재 차선 
             if (not self.is_lane_num_det) and (self.center_pt_x_orange < self.center_pt_x_blue):
                 self.lane_num = 1
-                pub_msg.lane_num = self.lane_num
+                
                 self.is_lane_num_det = True
             elif (not self.is_lane_num_det) and (self.center_pt_x_orange > self.center_pt_x_blue):
                 self.lane_num = 2
-                pub_msg.lane_num = self.lane_num
+                
                 self.is_lane_num_det = True
             else:
                 pass
@@ -100,9 +100,6 @@ class LaneDetector(Node):
 
             pub_msg.linear_x = self.compensate_y(self.roi_area, self.target_point_y)
             pub_msg.angular_z = self.compensate_x(self.width//2, self.target_point_x)
-            
-            print("pt_y_blue ; ", str(self.pt_y_blue))
-            print("pt_y_ornage ; ", str(self.pt_y_orange))
             
             # 1차선 회전
             if (self.lane_num == 1) and ((self.pt_y_blue > 40) or (self.pt_y_orange > 40)) :
@@ -117,14 +114,26 @@ class LaneDetector(Node):
                     self.is_turning = True
                     start_time = time.time()
                     while time.time() - start_time < 3:
-                        pub_msg.linear_x = 0.1
+                        pub_msg.linear_x = 0.08
                         pub_msg.angular_z = 0.0
                         self.publisher.publish(pub_msg)
                     start_time = time.time()
-                    while time.time() - start_time < 5:
+                    while time.time() - start_time < 5.236:
+                        pub_msg.angular_z = 0.3
                         pub_msg.linear_x = 0.0
-                        pub_msg.angular_z = 0.2
                         self.publisher.publish(pub_msg)
+                    start_time = time.time()
+                    while time.time() - start_time < 15:
+                        pub_msg.angular_z = 0.0
+                        pub_msg.linear_x = 0.08
+                        self.publisher.publish(pub_msg)
+                    if self.right_flag == True:
+                        start_time = time.time()
+                        while time.time() - start_time < 5.236:
+                            pub_msg.angular_z = -0.3
+                            pub_msg.linear_x = 0.0
+                            self.publisher.publish(pub_msg)
+                        self.right_flag = False
 
             elif (self.pt_y_blue < 5) and (self.pt_y_orange < 5):
                 self.is_turning = False
@@ -142,15 +151,27 @@ class LaneDetector(Node):
                     self.is_turning = True
                     start_time = time.time()
                     while time.time() - start_time < 3:
-                        pub_msg.linear_x = 0.1
+                        pub_msg.linear_x = 0.08
                         pub_msg.angular_z = 0.0
                         self.publisher.publish(pub_msg)
                     start_time = time.time()
-                    while time.time() - start_time < 5:
-                        pub_msg.angular_z = 0.2
+                    while time.time() - start_time < 5.236:
+                        pub_msg.angular_z = 0.3
                         pub_msg.linear_x = 0.0
                         self.publisher.publish(pub_msg)
-                        
+                    start_time = time.time()
+                    while time.time() - start_time < 15:
+                        pub_msg.angular_z = 0.0
+                        pub_msg.linear_x = 0.08
+                        self.publisher.publish(pub_msg)
+                    if self.right_flag == True:
+                        start_time = time.time()
+                        while time.time() - start_time < 5.236:
+                            pub_msg.angular_z = -0.3
+                            pub_msg.linear_x = 0.0
+                            self.publisher.publish(pub_msg)
+                        self.right_flag = False
+                            
             elif (self.pt_y_blue < 5) and (self.pt_y_orange < 5):
                 self.is_turning = False
                 self.turn_direction = "STRAIGHT"
@@ -173,6 +194,8 @@ class LaneDetector(Node):
             cv2.imshow('Image window', self.rgb_cv_image)
             cv2.waitKey(1)
             
+            pub_msg.lane_num = self.lane_num
+
             self.publisher.publish(pub_msg)
 
         except:
@@ -193,9 +216,6 @@ class LaneDetector(Node):
             pub_msg.linear_x = self.compensate_y(self.roi_area, self.target_point_y)
             pub_msg.angular_z = self.compensate_x(self.width//2, self.target_point_x)
 
-            print("pt_y_blue ; ", str(self.pt_y_blue))
-            print("pt_y_ornage ; ", str(self.pt_y_orange))
-
             # 1차선 회전
             if (self.lane_num == 1) and ((self.pt_y_blue > 40) or (self.pt_y_orange > 40)) :
                 self.turn_direction = "STRAIGHT"
@@ -209,14 +229,26 @@ class LaneDetector(Node):
                     self.is_turning = True
                     start_time = time.time()
                     while time.time() - start_time < 3:
-                        pub_msg.linear_x = 0.1
+                        pub_msg.linear_x = 0.08
                         pub_msg.angular_z = 0.0
                         self.publisher.publish(pub_msg)
                     start_time = time.time()
-                    while time.time() - start_time < 5:
-                        pub_msg.angular_z = 0.2
+                    while time.time() - start_time < 5.236:
+                        pub_msg.angular_z = 0.3
                         pub_msg.linear_x = 0.0
                         self.publisher.publish(pub_msg)
+                    start_time = time.time()
+                    while time.time() - start_time < 15:
+                        pub_msg.angular_z = 0.0
+                        pub_msg.linear_x = 0.08
+                        self.publisher.publish(pub_msg)
+                    if self.right_flag == True:
+                        start_time = time.time()
+                        while time.time() - start_time < 5.236:
+                            pub_msg.angular_z = -0.3
+                            pub_msg.linear_x = 0.0
+                            self.publisher.publish(pub_msg)
+                        self.right_flag = False
             elif (self.pt_y_blue < 5) and (self.pt_y_orange < 5):
                 self.is_turning = False
                 self.turn_direction = "STRAIGHT"
@@ -235,18 +267,32 @@ class LaneDetector(Node):
                     self.is_turning = True
                     start_time = time.time()
                     while time.time() - start_time < 3:
-                        pub_msg.linear_x = 0.1
+                        pub_msg.linear_x = 0.08
                         pub_msg.angular_z = 0.0
                         self.publisher.publish(pub_msg)
                     start_time = time.time()
-                    while time.time() - start_time < 5:
-                        pub_msg.angular_z = 0.2
+                    while time.time() - start_time < 5.236:
+                        pub_msg.angular_z = 0.3
                         pub_msg.linear_x = 0.0
                         self.publisher.publish(pub_msg)
+                    start_time = time.time()
+                    while time.time() - start_time < 15:
+                        pub_msg.angular_z = 0.0
+                        pub_msg.linear_x = 0.08
+                        self.publisher.publish(pub_msg)
+                    if self.right_flag == True:
+                        start_time = time.time()
+                        while time.time() - start_time < 5.236:
+                            pub_msg.angular_z = -0.3
+                            pub_msg.linear_x = 0.0
+                            self.publisher.publish(pub_msg)
+                        self.right_flag = False
             elif (self.pt_y_blue < 5) and (self.pt_y_orange < 5):
                 self.is_turning = False
                 self.turn_direction = "STRAIGHT"
             
+            pub_msg.lane_num = self.lane_num
+
             self.publisher.publish(pub_msg)
 
     def compensate_x(self, center_x, target_x):    

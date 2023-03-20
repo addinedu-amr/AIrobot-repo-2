@@ -43,7 +43,7 @@ class ObjectDetector(Node):
         self.depth_image = cv_depth.astype('float32') * depth_scale
 
         if not (self.center_x < 0 and self.center_y < 0):
-            self.get_logger().info(f'The distance of the detected obstacle is {self.depth_image[int(self.center_y), int(self.center_x)]} cm.')
+            #self.get_logger().info(f'The distance of the detected obstacle is {self.depth_image[int(self.center_y), int(self.center_x)]} cm.')
             self.pub_msg.distance = int(self.depth_image[int(self.center_y), int(self.center_x)])
             self.publisher.publish(self.pub_msg)
 
@@ -61,7 +61,7 @@ class ObjectDetector(Node):
             cv2.circle(rgb_cv_image, (int(self.center_x), int(self.center_y)), 10, (0, 255, 0), -1)
             print(str(self.center_x), str(self.center_y), str(result_tolist[-1]))
         else:
-            print('not detected', result_tolist)
+            #print('not detected', result_tolist)
             self.center_x, self.center_y = -1, -1
 
         self.pub_msg = ObjectDetection()
