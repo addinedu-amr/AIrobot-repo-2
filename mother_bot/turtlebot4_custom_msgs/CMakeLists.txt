@@ -16,6 +16,7 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ObjectDetection.msg"
   "msg/LaneDetection.msg"
+  "msg/MarkerDetection.msg"
   "action/Behavior.action"
 )
 
