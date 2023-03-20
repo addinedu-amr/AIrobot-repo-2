@@ -10,6 +10,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from minibot_msgs.msg import IsObstacle
 from minibot_msgs.msg import StartEnd
+from minibot_msgs.msg import NextMission
 
 import time
 from geometry_msgs.msg import Twist
@@ -25,8 +26,11 @@ class Subscriber(Node):
         self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10, callback_group=self.callback_group)
         self.subscription2 = self.create_subscription(StartEnd, 'Robot_order', self.test_callback, 10)
         self.publisher = self.create_publisher(Twist, 'base_controller/cmd_vel_unstamped', 10)
-
-
+        self.publisher_mission = self.create_publisher(NextMission, 'Mission_complete', 10) 
+        
+        timer_period = 1  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
 
         self.order_start = False
         self.path_count = 1
@@ -38,6 +42,15 @@ class Subscriber(Node):
         
         self.result = None
         self.check_obstacle = False
+
+        self.obstacle_area = None
+
+        self.mission_ing = False
+
+    def timer_callback(self):
+        msg = NextMission()
+        msg.mission = self.mission_ing
+        self.publisher_mission.publish(msg)
 
     def obstacle_callback(self, msg):
         threading.Thread(target=self.process_message_b, args=(msg,)).start()
@@ -52,9 +65,10 @@ class Subscriber(Node):
             if self.pre_order_y == msg.end_y and self.pre_order_x == msg.end_x:
                 pass
             else:
-                self.result, self.path = my_robot_path("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml", self.now_location, (msg.end_y, msg.end_x) )
+                self.result, self.path = my_robot_path("/home/du/mini_bot/baby_map.pgm", "/home/du/mini_bot/baby_map.yaml", self.now_location, (msg.end_y, msg.end_x), self.obstacle_area )
                 self.pre_order_y = msg.end_y
                 self.pre_order_x = msg.end_x
+                self.mission_ing = True
                 self.order_start = True
 
         if self.path != None:
@@ -63,11 +77,18 @@ class Subscriber(Node):
                 if success == True:
                     self.path_count = self.path_count + 1
                 else:
-                    print("0.2m 후진합니다.")
+                    print("로봇이 후진합니다.")
                     self.back_robot()
-                    time.sleep(5)
+                    print("경로를 재탐색합니다.")
+                    self.obstacle_area = self.path[self.path_count]
+                    self.order_start = False
+                    self.path = None
+                    self.pre_order_y = None
+                    self.pre_order_x = None
+                    self.path_count = 1
             else:
                 self.order_start = False
+                self.mission_ing = False
                 self.path = None
                 self.path_count = 1
         else:
@@ -81,10 +102,12 @@ class Subscriber(Node):
     # 후진하는 부분
     def back_robot(self):
         print("후진을 실시합니다.")
-        twist = Twist()
-        twist.linear.x = -0.2  # 속도 값을 -0.2로 수정
-        twist.angular.z = 0.0
-        self.publisher.publish(twist)
+        for i in range(10):
+            twist = Twist()
+            twist.linear.x = -0.08  # 속도 값을 -0.2로 수정
+            twist.angular.z = 0.0
+            self.publisher.publish(twist)
+            time.sleep(1)
 
 
 # 실시간 구독한 장애물 정보를 전역변수로 선언하면 될듯..
@@ -95,10 +118,12 @@ def check_obstacle_front(check):
 
 
 
-def my_robot_path(pgm_path, yaml_path, start, end):
+def my_robot_path(pgm_path, yaml_path, start, end, obstacle_area):
     image = image_processing.pgm_to_matrix(pgm_path, yaml_path ,3 , 12, -1.1, 2.2)
     image.run()
     my_map = image.matrix
+    if obstacle_area != None:
+        my_map[obstacle_area[0]][obstacle_area[1]] = 1
     make_route = Astar.Astar()
     result, path = make_route.run(my_map , start, end)
     return result, path
@@ -120,8 +145,8 @@ def go_my_robot(my_map_coordinate, start, end):
     elif end[1] - start[1] == -1:
         my_map_coordinate[end[0]][end[1]].pose.orientation.x = 0.0
         my_map_coordinate[end[0]][end[1]].pose.orientation.y = 0.0
-        my_map_coordinate[end[0]][end[1]].pose.orientation.z = 0.0
-        my_map_coordinate[end[0]][end[1]].pose.orientation.w = -1.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.z = -1.0
+        my_map_coordinate[end[0]][end[1]].pose.orientation.w = 0
     
     # 서쪽
     elif end[0] - start[0] == -1:
