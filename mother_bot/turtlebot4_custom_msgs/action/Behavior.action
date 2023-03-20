@@ -2,8 +2,7 @@
 string boot
 ---
 # result
-string lane
+string dock
 ---
 # feedback
-int8 lane_num
 string status
