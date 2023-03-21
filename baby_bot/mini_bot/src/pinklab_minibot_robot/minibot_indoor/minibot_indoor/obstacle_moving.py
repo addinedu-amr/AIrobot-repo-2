@@ -1,3 +1,4 @@
+# 사용하지 않는 코드, Path Planning.py코드가 모두 처리하고 있습니다.
 import rclpy as rp
 from rclpy.node import Node
 from minibot_msgs.msg import IsObstacle
