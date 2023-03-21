@@ -20,7 +20,7 @@ class ObstacleDetect(Node):
         )
         self.sub_scan = self.create_subscription(LaserScan, "/scan", self.callback_scan, qos_profile)
         self.timer_period = 0.5
-        self.publisher = self.create_publisher(IsObstacle, "/obstacle_detect", qos_profile)
+        self.publisher = self.create_publisher(IsObstacle, "/obstacle_detect", 10)
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
         self.is_osbstacle = IsObstacle()
         
@@ -32,7 +32,7 @@ class ObstacleDetect(Node):
             min_data = np.average(min_data)
         self.is_osbstacle.min_distance = float(min_data)
         
-        if min_data < 0.35:                    # 0.35m 이하이면 주행 멈추라고 신호 줌
+        if min_data < 0.3:                    # 0.35m 이하이면 주행 멈추라고 신호 줌
             self.is_osbstacle.check_obstacle = True
         else:
             self.is_osbstacle.check_obstacle = False

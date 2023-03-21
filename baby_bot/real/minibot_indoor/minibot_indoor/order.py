@@ -13,8 +13,8 @@ class Publisher(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
-        self.end_point_x = [0, 2, 0, 2]
-        self.end_point_y = [2, 4, 6, 11]
+        self.end_point_x = [0, 0]
+        self.end_point_y = [2, 6]
 
         self.end_point_count = 0
         self.now_status = False

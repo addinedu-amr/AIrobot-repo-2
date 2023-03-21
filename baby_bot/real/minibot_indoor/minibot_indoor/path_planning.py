@@ -22,6 +22,7 @@ nav = BasicNavigator()
 class Subscriber(Node):
     def __init__(self):
         super().__init__('test_sub')
+
         self.callback_group = rp.callback_groups.ReentrantCallbackGroup()
         self.subscription1 = self.create_subscription(IsObstacle, '/obstacle_detect', self.obstacle_callback, 10, callback_group=self.callback_group)
         self.subscription2 = self.create_subscription(StartEnd, 'Robot_order', self.test_callback, 10)
@@ -46,6 +47,10 @@ class Subscriber(Node):
         self.obstacle_area = None
 
         self.mission_ing = False
+
+        self.restart = False
+
+        self.my_map_coordinate = get_my_map_coordinate()
 
     def timer_callback(self):
         msg = NextMission()
@@ -74,13 +79,14 @@ class Subscriber(Node):
 
         if self.path != None:
             if len(self.path) > self.path_count:
-                self.now_location, success = go_my_robot(get_my_map_coordinate(), self.now_location, self.path[self.path_count])
+                self.now_location, success = go_my_robot(self.my_map_coordinate, self.now_location, self.path[self.path_count])
                 if success == True:
                     self.path_count = self.path_count + 1
                 else:
                     print("로봇이 후진합니다.")
                     self.back_robot()
                     print("경로를 재탐색합니다.")
+                    self.restart = True
                     self.obstacle_area = self.path[self.path_count]
                     self.order_start = False
                     self.path = None
@@ -103,9 +109,16 @@ class Subscriber(Node):
     # 후진하는 부분
     def back_robot(self):
         print("후진을 실시합니다.")
-        for i in range(10):
+        for i in range(11):
             twist = Twist()
-            twist.linear.x = -0.08  # 속도 값을 -0.2로 수정
+            twist.linear.x = 0.0  # 속도 값을 -0.2로 수정
+            twist.angular.z = 0.628
+            self.publisher.publish(twist)
+            time.sleep(1)
+
+        for i in range(5):
+            twist = Twist()
+            twist.linear.x = 0.08  # 속도 값을 -0.2로 수정
             twist.angular.z = 0.0
             self.publisher.publish(twist)
             time.sleep(1)
@@ -182,7 +195,7 @@ def go_my_robot(my_map_coordinate, start, end):
             feedback = nav.getFeedback()
             if feedback and i % 5 == 0:
                 print("Distance remaining : " + str(feedback.distance_remaining) + " m")
-                if feedback.distance_remaining > 0.1:
+                if feedback.distance_remaining > 0.15:
                     pass
                 else:
                     print("Distance remaining : " + str(feedback.distance_remaining) + " m")
