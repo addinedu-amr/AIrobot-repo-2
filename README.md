@@ -68,46 +68,46 @@ __차세대 물류 서비스 구현__ 을 위해 저희는 __배송로봇__ 을 
 
 
 ## 프로젝트 역할 분배
-### Task 1 : RGB-D Camera를 활용한 RtabMap 으로  Visual SLAM 결과물 제시 (2인인)
+### Task 1 : RGB-D Camera를 활용한 RtabMap 으로  Visual SLAM 결과물 제시
 - **장애물 탐지 및 렌드마크 탐지 알고리즘 및 ROS상에서 메시지로 발행하는 코드 작성**
 
 <br>
 
-### Task 2 :  Visual SLAM(실외) 로봇의 ROS 패키지 설계 및 FSM 설계 (3인)
+### Task 2 :  Visual SLAM(실외) 로봇의 ROS 패키지 설계 및 FSM 설계
 - **FSM 설계** 
 - **Visual SLAM(실외) 로봇의 ROS 패키지 설계**  
 
 <br>
 
-### Task 3 : 내부 로봇의 FSM 설계 및 ROS 패키지 설계 (3인)
-- **FSM 설계** ROS 패키지 설계를 편하게 하기 위함
+### Task 3 : 내부 로봇의 FSM 설계 및 ROS 패키지 설계
+- **FSM 설계** 
 - **SLAM(실내) 로봇의 ROS 패키지 설계** 
 
 <br>
 
-### Task 4 : 언리얼 엔진을 통한 ROS simulation 결과물 제시 (2인)
+### Task 4 : 언리얼 엔진을 통한 ROS simulation 결과물 제시 
 - **ROS simulation 결과물 제시 **
 - **Localization 된 로봇의 위치정보와 경로정보를 ROS를 통해 받아 화면에 출력하기**
 
 <br>
 
-### Task 5 : 차선 인식 및 중앙점으로 경로를 생성하는 코드 작성 (3 인)
+### Task 5 : 차선 인식 및 중앙점으로 경로를 생성하는 코드 작성 
 - **차선인식 이미지 segmentation 모델 개발**
-- **중앙점 경로 생성 알고리즘 개발** (가장 급하고 가장 중요)
+- **중앙점 경로 생성 알고리즘 개발** 
 - **터틀봇의 하드웨어적 특성 이해 및 구현**
 - **모니터링 정보(Localization)를 ROS상에 지속적으로 전송**
 
 <br>
 
-### Task 6 : YOLO 를 통한 신호등 탐지 및 ROS topic 발행 (2인)
-- **신호등 제작 (완료) 및 YOLO detection 하기  (렌드마크도 추가될 가능성 있음)**
+### Task 6 : YOLO 를 통한 신호등 탐지 및 ROS topic 발행 
+- **신호등 제작  및 YOLO detection 하기  **
 - **ROS 상으로 YOLO detection 정보 ROS 상으로 전송**
 - **모니터링 정보(신호등 정보)를 ROS상에 지속적으로 전송**
 
 <br>
 
-### Task 7 : 핑크봇 경로생성 알고리즘 작성 (3 인)
-- **Nav2를 이용하여 긴 경로를 짧게 나누어 수행하는 코드 작성  (중요)**
+### Task 7 : 핑크봇 경로생성 알고리즘 작성 
+- **Nav2를 이용하여 긴 경로를 짧게 나누어 수행하는 코드 작성 **
 - **SLAM에서 발생하는 문제로 파라미터를 수정해야함.**
 - **모니터링 정보(Localization, 교통흐름 정보)를 ROS상에 지속적으로 전송**
 
