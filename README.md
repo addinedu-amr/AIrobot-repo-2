@@ -111,3 +111,19 @@ __차세대 물류 서비스 구현__ 을 위해 저희는 __배송로봇__ 을 
 - SLAM에서 발생하는 문제로 파라미터를 수정해야함.
 - 모니터링 정보(Localization, 교통흐름 정보)를 ROS상에 지속적으로 전송
 
+
+
+## 프로젝트 설계
+#### 실외팀
+![image](https://user-images.githubusercontent.com/110883172/228341795-3fcbdb3b-26ab-449d-9beb-465660a1ca99.png)
+
+###### FSM 
+![image](https://user-images.githubusercontent.com/110883172/228341648-736681e1-7b41-41af-9a74-483c2c086443.png)
+![image](https://user-images.githubusercontent.com/110883172/228341675-f0758a6d-a96a-416c-ba3e-0ea7e907e077.png)
+
+#### 실내팀
+![image](https://user-images.githubusercontent.com/110883172/228341913-a3074fb2-c71b-4769-aa06-088f95717925.png)
+
+###### FSM 
+![image](https://user-images.githubusercontent.com/110883172/228341761-f30b833e-8bd3-40d6-9f30-835609e2b30b.png)
+
