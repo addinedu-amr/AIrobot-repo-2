@@ -113,8 +113,8 @@ __차세대 물류 서비스 구현__ 을 위해 저희는 __배송로봇__ 을 
 
 
 
-## 프로젝트 설계
-#### 실외팀
+# 프로젝트 설계
+## 실외팀
 <img src="https://user-images.githubusercontent.com/110883172/228341795-3fcbdb3b-26ab-449d-9beb-465660a1ca99.png" width="400" height="400">
 
 ###### FSM 
@@ -134,3 +134,8 @@ __차세대 물류 서비스 구현__ 을 위해 저희는 __배송로봇__ 을 
 ![image](https://user-images.githubusercontent.com/110883172/228342043-6f3ff742-0d75-47f7-93db-732849f6c4cc.png)
 
 
+
+
+## 시연 영상 및 발표자료
+https://drive.google.com/drive/u/0/folders/1R1ovG2RRWLp4bEwD6xvNP4l7pT6LySTy
+- 다음의 링크를 
