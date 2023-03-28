@@ -126,8 +126,7 @@ __차세대 물류 서비스 구현__ 을 위해 저희는 __배송로봇__ 을 
 
 
 ## 실내팀
-<img src="https://user-images.githubusercontent.com/110883172/228341913-a3074fb2-c71b-4769-aa06-088f95717925.png" width="200" height="200">
-
+![image](https://user-images.githubusercontent.com/110883172/228341913-a3074fb2-c71b-4769-aa06-088f95717925.png)
 ###### FSM 
 ![image](https://user-images.githubusercontent.com/110883172/228341761-f30b833e-8bd3-40d6-9f30-835609e2b30b.png)
 
