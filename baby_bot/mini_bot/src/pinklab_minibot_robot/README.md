@@ -29,3 +29,8 @@ $ ros2 launch minibot_bringup bringup_robot_gazebo.launch.py world_name:=simple_
 ``` shell
 $ ros2 launch minibot_bringup bringup_robot.launch
 ```
+
+
+
+## 프로젝트에서 직접 만든 패키지는 
+- indoor 패키지와 msg 패키지입니다.
