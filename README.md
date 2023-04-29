@@ -1,7 +1,6 @@
 # 로봇 가족
 ##### 부제 : 미래형 라스트마일 배송로봇 구현
 
-__3월 23일까지 최신화 및 Readme 수정이 있을 예정입니다.__
 
 <br>
 <img src="https://user-images.githubusercontent.com/110883172/218902218-3180dd52-6303-4bcb-adc9-3e61bb6fd40e.png" width="200" height="200">
